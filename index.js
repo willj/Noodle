@@ -41,6 +41,8 @@ module.exports = function(settings) {
 
         let html = renderPage(templates[templateName], md.render(doc.body), model);
 
+        util.createDir(settings.outputDir + "test/sub/dir/creation");
+
         fs.writeFile(settings.outputDir + path.parse(page).name + ".html", html, (err) => {
             if (err) return console.error(err);
         })
