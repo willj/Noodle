@@ -1,6 +1,8 @@
-var noodle = require("../");
+'use strict';
 
-var settings = {
+const noodle = require("../src");
+
+const settings = {
     name: "Sample noodle site"
 };
 
