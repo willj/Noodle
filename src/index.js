@@ -4,6 +4,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const rimraf = require("rimraf");
 const fm = require("front-matter");
 const hbs = require("Handlebars");
 const md = require("markdown-it")({ html: true });
@@ -14,7 +15,8 @@ const defaultSettings = {
     outputDir: "./docs/", 
     sourceDir: "./site/",
     templateDir: "./templates/",
-    partialsDir: "./templates/partials/"
+    partialsDir: "./templates/partials/",
+    removeOutputDir: true
 };
 
 module.exports = function(settings) {
@@ -22,6 +24,12 @@ module.exports = function(settings) {
     console.log("This is Noodle!");
 
     util.mergeSettings(settings, defaultSettings);
+
+    if (settings.removeOutputDir){
+        rimraf.sync(settings.outputDir);
+    }
+
+    util.createDir(settings.outputDir);
 
     loadPartials(settings.partialsDir);
 
