@@ -8,7 +8,7 @@ const path = require("path");
 module.exports = {
     mergeSettings: function (settings, defaultSettings) {
         Object.keys(defaultSettings).forEach(function(key) {
-            if (!settings[key]) {
+            if (!(key in settings)) {
                 settings[key] = defaultSettings[key];
             }
         }, this);
