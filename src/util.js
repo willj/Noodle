@@ -6,12 +6,14 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = {
-    mergeSettings: function (settings, defaultSettings) {
-        Object.keys(defaultSettings).forEach(function(key) {
-            if (!(key in settings)) {
-                settings[key] = defaultSettings[key];
-            }
-        }, this);
+    mergeSettings: function (userSettings, defaultSettings) {
+        let mergedSettings = userSettings;
+        
+        Object.keys(defaultSettings).forEach((key) => {
+            mergedSettings[key] = (key in userSettings) ? userSettings[key] : defaultSettings[key];
+        });
+
+        return mergedSettings;
     },
 
     getTemplateName: function (fileName, pageAttributes, templates) {

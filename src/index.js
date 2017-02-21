@@ -16,14 +16,15 @@ const defaultSettings = {
     sourceDir: "./site/",
     templateDir: "./templates/",
     partialsDir: "./templates/partials/",
+    //blogDir: "./posts/",
     removeOutputDir: true
 };
 
-module.exports = function(settings) {
+module.exports = function(userSettings) {
     
     console.log("This is Noodle!");
 
-    util.mergeSettings(settings, defaultSettings);
+    let settings = util.mergeSettings(userSettings, defaultSettings);
 
     if (settings.removeOutputDir){
         rimraf.sync(settings.outputDir);
@@ -34,6 +35,9 @@ module.exports = function(settings) {
     loadPartials(settings.partialsDir);
 
     let templates = loadTemplates(settings.templateDir);
+
+    // need to deal with sub dirs here
+    // console.log(fs.readdirSync(settings.sourceDir));
 
     let pages = fs.readdirSync(settings.sourceDir).filter((file) => {
         return path.extname(file) === ".md";
@@ -53,7 +57,7 @@ module.exports = function(settings) {
 
         fs.writeFile(settings.outputDir + path.parse(page).name + ".html", html, (err) => {
             if (err) return console.error(err);
-        })
+        });
 
     });
 }

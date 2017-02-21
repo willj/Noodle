@@ -3,7 +3,8 @@
 const noodle = require("../src");
 
 const settings = {
-    name: "Sample noodle site"
+    siteTitle: "Sample noodle site",
+    somethingElse: "123"
 };
 
 noodle(settings);
