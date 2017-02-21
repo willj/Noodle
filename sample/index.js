@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const noodle = require("../src");
 
