@@ -11,7 +11,7 @@ const md = require("markdown-it")({ html: true });
 const util = require("./util");
 
 const defaultSettings = {
-    name: "A Noodle site",
+    siteTitle: "A Noodle site",
     outputDir: "./docs/", 
     sourceDir: "./site/",
     templateDir: "./templates/",
