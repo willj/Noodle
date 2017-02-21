@@ -11,10 +11,10 @@ const util = require("./util");
 
 const defaultSettings = {
     name: "A Noodle site",
-    outputDir: "./", 
-    sourceDir: "./src/",
-    templateDir: "./src/template/",
-    partialsDir: "./src/template/partials/"
+    outputDir: "./docs/", 
+    sourceDir: "./site/",
+    templateDir: "./templates/",
+    partialsDir: "./templates/partials/"
 };
 
 module.exports = function(settings) {
