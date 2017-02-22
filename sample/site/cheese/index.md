@@ -1,6 +1,7 @@
 ---
 title: Cheese!
 date: 2017/02/21
+template: cheddar
 ---
 # Page about cheese
 

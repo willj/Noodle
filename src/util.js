@@ -16,14 +16,33 @@ module.exports = {
         return mergedSettings;
     },
 
-    getTemplateName: function (fileName, pageAttributes, templates) {
-        /* 
-            TODO:
-            - look for a specified template
-            - or use filename
-            - or fallback to index/post/or similar
-        */
-        return "index";
+    getTemplateName: function (filePath, pageAttributes, templates) {
+
+        // if a template was specified, and it exists, use it
+        if ("template" in pageAttributes){
+            if (pageAttributes.template in templates){
+                return pageAttributes.template;
+            } else {
+                console.warn("The template '" + pageAttributes.template + "' specified by '" + filePath  + "' does not exist.");
+            }
+        }
+
+        // if a template name matches a filename, use that
+        if (path.parse(filePath).name in templates){
+            return path.parse(filePath).name;
+        }
+
+        // if the type property (page|post|custom..) was specified and a template name matches use that
+        if ("type" in pageAttributes && pageAttributes.type in templates){
+            return pageAttributes.type;
+        }
+
+        // otherwise index should be default
+        if ("index" in templates){
+            return "index";
+        } else {
+            console.error("No matching template can be found for " + filePath);
+        }
     },
 
     createDir: function (path) {

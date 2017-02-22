@@ -37,8 +37,9 @@ module.exports = {
         let model = this.settings;
         model.doc = doc.attributes;
 
-        // TODO: fix this, do we neeed to pass file, or does doc have the filename?
-        let templateName = util.getTemplateName(fileName, doc, this.templates);  
+        let templateName = util.getTemplateName(filePath + fileName, doc.attributes, this.templates);  
+
+        if (templateName == undefined) return;
 
         let html = this.renderPage(this.templates[templateName], md.render(doc.body), model);
 
