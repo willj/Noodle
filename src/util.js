@@ -45,6 +45,10 @@ module.exports = {
         }
     },
 
+    getSlug: function(title){
+        return title;   // TODO: This needs to create a usable slug
+    },
+
     createDir: function (path) {
 
         let createdPath = "";

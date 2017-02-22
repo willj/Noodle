@@ -11,7 +11,7 @@ const defaultSettings = {
     sourceDir: "./site/",
     templateDir: "./templates/",
     partialsDir: "./templates/partials/",
-    //blogDir: "./posts/",
+    blogDir: "./posts/cheese/",
     removeOutputDir: true
 };
 

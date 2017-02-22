@@ -36,6 +36,7 @@ module.exports = {
 
         let model = this.settings;
         model.doc = doc.attributes;
+        model.fileDestination = this.getFileDestination(filePath, fileName, doc.attributes);
 
         let templateName = util.getTemplateName(filePath + fileName, doc.attributes, this.templates);  
 
@@ -43,9 +44,48 @@ module.exports = {
 
         let html = this.renderPage(this.templates[templateName], md.render(doc.body), model);
 
-        fs.writeFile(this.settings.outputDir + filePath + path.parse(fileName).name + ".html", html, (err) => {
+        if (model.fileDestination.path){
+            util.createDir(this.settings.outputDir + model.fileDestination.path);
+        }
+
+        fs.writeFile(this.settings.outputDir + model.fileDestination.path + model.fileDestination.fileName, html, (err) => {
             if (err) return console.error(err);
         });
+    },
+
+    getFileDestination: function (filePath, fileName, pageAttributes){
+        
+        // if attributes have a permalink defined
+        if ("permalink" in pageAttributes){
+            let plink = path.parse(pageAttributes.permalink);
+
+            if (plink.ext){
+                return {
+                    path: plink.dir + "/",
+                    fileName: plink.name + plink.ext
+                }
+            } else {
+                return {
+                    path: plink.dir + "/" + plink.name + "/",
+                    fileName: "index.html"
+                }
+            }
+        }
+
+        // if it's a post
+        if (("type" in pageAttributes && pageAttributes.type == "post")){
+            // TODO: should we have a global option to set this? whether to use .html, whether to use year/month
+            // return {
+            //     path: "year/month/",
+            //     fileName: util.getSlug(pageAttributes.title) + ".html"  
+            // }
+        }
+
+        return {
+            path: filePath,
+            fileName: path.parse(fileName).name + ".html"
+        }
+
     },
 
     processDirectory: function(sourceRoot, currentPath){
