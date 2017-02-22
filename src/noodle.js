@@ -103,11 +103,5 @@ module.exports = {
         let partialContent = fs.readFileSync(file, "utf8");
 
         hbs.registerPartial(path.parse(file).name, partialContent);
-    },
-
-    log: function (){
-        console.log("logging");
-        console.log(this.settings);
     }
-
 };
