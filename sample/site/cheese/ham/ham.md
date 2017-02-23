@@ -1,5 +1,5 @@
 ---
-title: ham!
+title: "!ham!*with some other stuff like !tomato!"
 date: 2017/02/21
 template: ham
 type: page

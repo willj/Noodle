@@ -34,6 +34,10 @@ module.exports = {
     processPage: function(filePath, fileName){
         let doc = fm(fs.readFileSync(this.settings.sourceDir + filePath + fileName, "utf8"));
 
+        if (this.isInPostsDirectory(filePath)){
+            doc.attributes.type = "post";
+        }
+
         let model = this.settings;
         model.doc = doc.attributes;
         model.fileDestination = this.getFileDestination(filePath, fileName, doc.attributes);
@@ -74,13 +78,29 @@ module.exports = {
 
         // if it's a post
         if (("type" in pageAttributes && pageAttributes.type == "post")){
-            // TODO: should we have a global option to set this? whether to use .html, whether to use year/month
-            // return {
-            //     path: "year/month/",
-            //     fileName: util.getSlug(pageAttributes.title) + ".html"  
-            // }
+            let d = new Date(pageAttributes.date);
+        
+            // if no date, or an invalid date, we'll go with this
+            if (isNaN(d.getFullYear()) || isNaN(d.getMonth())){
+                d = new Date("1970/01/01");
+            }
+
+            let postPathDate = (this.settings.useDateInPostUrls) ? d.getFullYear() + "/" + (d.getMonth() + 1) + "/" : "";
+
+            if (this.settings.removeFileExtFromUrls){
+                return {
+                    path: postPathDate + util.getSlug(pageAttributes.title) + "/",
+                    fileName: "index.html"
+                }
+            } else {
+                return {
+                    path: postPathDate,
+                    fileName: util.getSlug(pageAttributes.title) + ".html"
+                }
+            }
         }
 
+        // no permalink, and isn't a post
         if (this.settings.removeFileExtFromUrls){
             return {
                 path: filePath + "/" + path.parse(fileName).name + "/",
@@ -96,8 +116,8 @@ module.exports = {
     },
 
     processDirectory: function(sourceRoot, currentPath){
-        fs.readdirSync(sourceRoot + currentPath).forEach((file) => {
 
+        fs.readdirSync(sourceRoot + currentPath).forEach((file) => {
             let fileInfo = fs.statSync(sourceRoot + currentPath + file);
 
             if (fileInfo.isDirectory()){
@@ -151,5 +171,9 @@ module.exports = {
         let partialContent = fs.readFileSync(file, "utf8");
 
         hbs.registerPartial(path.parse(file).name, partialContent);
+    },
+
+    isInPostsDirectory: function(dir){
+        return (dir.indexOf(this.settings.postsDir.replace(/^\.\//, "")) === 0);
     }
 };

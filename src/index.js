@@ -11,9 +11,10 @@ const defaultSettings = {
     sourceDir: "./site/",
     templateDir: "./templates/",
     partialsDir: "./templates/partials/",
-    blogDir: "./posts/",
+    postsDir: "./posts/",
     removeOutputDir: true,
-    removeFileExtFromUrls: true
+    removeFileExtFromUrls: true,
+    useDateInPostUrls: true
 };
 
 module.exports = function(userSettings) {
