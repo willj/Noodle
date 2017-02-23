@@ -13,6 +13,7 @@ const util = require("./util");
 module.exports = {
     settings: null, 
     templates: null,
+    posts: {},
     
     init: function (settings){
         this.settings = settings;
@@ -29,10 +30,13 @@ module.exports = {
         util.createDir(this.settings.outputDir);
 
         this.processDirectory(this.settings.sourceDir, "");
+
+        this.generatePostPages();
     },
 
     processPage: function(filePath, fileName){
-        let doc = fm(fs.readFileSync(this.settings.sourceDir + filePath + fileName, "utf8"));
+        let docSourcePath = this.settings.sourceDir + filePath + fileName;
+        let doc = fm(fs.readFileSync(docSourcePath, "utf8"));
 
         if (this.isInPostsDirectory(filePath)){
             doc.attributes.type = "post";
@@ -40,11 +44,16 @@ module.exports = {
 
         let model = this.settings;
         model.doc = doc.attributes;
+        model.fileSource = docSourcePath;
         model.fileDestination = this.getFileDestination(filePath, fileName, doc.attributes);
 
         let templateName = util.getTemplateName(filePath + fileName, doc.attributes, this.templates);  
 
         if (templateName == undefined) return;
+
+        if ("type" in model.doc && model.doc.type == "post"){
+            this.indexPost(model);
+        }
 
         let html = this.renderPage(this.templates[templateName], md.render(doc.body), model);
 
@@ -55,6 +64,31 @@ module.exports = {
         fs.writeFile(this.settings.outputDir + model.fileDestination.path + model.fileDestination.fileName, html, (err) => {
             if (err) return console.error(err);
         });
+    },
+
+    indexPost: function(post){
+        let d = util.getPostDate(post.doc.date);
+
+        if (!this.posts[d.getFullYear()]){
+            this.posts[d.getFullYear()] = {};
+        }
+
+        if (!this.posts[d.getFullYear()][d.getMonth()]){
+            this.posts[d.getFullYear()][d.getMonth()] = {}
+        }
+
+        if (!this.posts[d.getFullYear()][d.getMonth()][d.getDate()]){
+            this.posts[d.getFullYear()][d.getMonth()][d.getDate()] = [];
+        }
+
+        let p = {
+            fileSource: post.fileSource,
+            fileDestination: post.fileDestination,
+            attributes: post.doc,
+            postDate: d
+        };
+
+        this.posts[d.getFullYear()][d.getMonth()][d.getDate()].push(p);
     },
 
     getFileDestination: function (filePath, fileName, pageAttributes){
@@ -78,12 +112,7 @@ module.exports = {
 
         // if it's a post
         if (("type" in pageAttributes && pageAttributes.type == "post")){
-            let d = new Date(pageAttributes.date);
-        
-            // if no date, or an invalid date, we'll go with this
-            if (isNaN(d.getFullYear()) || isNaN(d.getMonth())){
-                d = new Date("1970/01/01");
-            }
+            let d = util.getPostDate(pageAttributes.date);
 
             let postPathDate = (this.settings.useDateInPostUrls) ? d.getFullYear() + "/" + (d.getMonth() + 1) + "/" : "";
 
@@ -130,6 +159,11 @@ module.exports = {
                 .pipe(fs.createWriteStream(this.settings.outputDir + currentPath + file));
             }
         });
+    },
+
+    generatePostPages: function(){
+        // console.log(this.posts);
+        // console.log(this.posts[2017][1]);
     },
 
     renderPage: function (template, body, model) {
