@@ -81,9 +81,16 @@ module.exports = {
             // }
         }
 
-        return {
-            path: filePath,
-            fileName: path.parse(fileName).name + ".html"
+        if (this.settings.removeFileExtFromUrls){
+            return {
+                path: filePath + "/" + path.parse(fileName).name + "/",
+                fileName: "index.html"
+            }
+        } else {
+            return {
+                path: filePath,
+                fileName: path.parse(fileName).name + ".html"
+            }
         }
 
     },
