@@ -64,5 +64,16 @@ module.exports = {
 
             createdPath += dir + "/";
         });
+    },
+
+    getPostDate: function(date){
+        let d = new Date(date);
+        
+        // if no date, or an invalid date, we'll go with this
+        if (isNaN(d.getFullYear()) || isNaN(d.getMonth())){
+            d = new Date("1970/01/01");
+        }
+
+        return d;
     }
 };

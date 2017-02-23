@@ -14,7 +14,10 @@ const defaultSettings = {
     postsDir: "./posts/",
     removeOutputDir: true,
     removeFileExtFromUrls: true,
-    useDateInPostUrls: true
+    useDateInPostUrls: true,
+    postsPerPage: 10,
+    postsPermalink: "index.html",
+    postsPagingPath: "page"
 };
 
 module.exports = function(userSettings) {
