@@ -151,29 +151,36 @@ module.exports = {
         });
     },
 
-    getPostPagePaths: function(){
-        /*
-            TODO: work out blog paths
-            if pp has dir or name and no extension, create dir, set pagingPath to dir/pagingPath
-            if pp has no extension and no dir - then create dir from name, set pagingPath to dir/pagingPath
-            if pp has extension and no dir do nothing, set pagingPath to pagingPath
-            if pp has extension and dir, then create dir, set pagingPath to dir/pagingPath
-
-            each page needs to create a /2/index.html
-        */
-
+    getPostPagePath: function(){
         let pp = path.parse(this.settings.postsPermalink);
 
-        if (pp.ext){
-
+        if (pp.ext && pp.dir){
+            console.log("1");
+            return {
+                path: pp.dir + "/",
+                fileName: pp.name + pp.ext
+            };
         }
 
-        console.log(pp);
+        if (pp.ext && !pp.dir){
+            console.log("2");
+            return {
+                path: "",
+                fileName: pp.name + pp.ext
+            };
+        }
+
+        if (!pp.ext){
+            console.log("3");
+            return {
+                path: pp.dir + "/" + pp.name + "/",
+                fileName: "index.html"
+            };
+        }
     },
 
     generatePostPages: function(){
-
-        let postPaths = this.getPostPagePaths();
+        let postPath = this.getPostPagePath();
 
         let pageOfPosts = [];
         let pageNum = 1;
@@ -187,7 +194,7 @@ module.exports = {
             pageOfPosts.push(this.posts[post]);
 
             if (pageOfPosts.length >= this.settings.postsPerPage){
-                this.generatePostPage(pageOfPosts, pageNum);
+                this.generatePostPage(pageOfPosts, pageNum, postPath);
                 pageOfPosts = [];
                 pageNum += 1;
             }
@@ -195,35 +202,37 @@ module.exports = {
 
         // generate the last page of posts
         if (pageOfPosts.length > 0){
-            this.generatePostPage(pageOfPosts, pageNum);
+            this.generatePostPage(pageOfPosts, pageNum, postPath);
         }
     },
 
-    generatePostPage: function(posts, pageNum){
-        // console.log(pageNum);
-        // console.log(posts);
-
+    generatePostPage: function(posts, pageNum, postPath){
         let model = this.settings;
         model.pageNum = pageNum;
         model.posts = posts;
 
-        //console.log(posts);
-
         let templateName = util.getTemplateName(this.settings.postsPermalink, {type: "posts"}, this.templates);  
+
+        console.log("template: " + templateName);
 
         if (templateName == undefined) return;
 
         let html = this.renderPage(this.templates[templateName], "", model);
 
-        //console.log(html);
+        let fileDestination = this.settings.outputDir + postPath.path;
 
-        let fileDestination = this.settings.outputDir + this.settings.postsPermalink;
+        util.createDir(fileDestination);
 
-        if (pageNum > 1){
-            let fileDestination = this.settings.outputDir + pageNum + "/" + this.settings.postsPermalink;
+        if (pageNum == 1){
+            fileDestination = fileDestination + postPath.fileName;
+        } else {
+            fileDestination = fileDestination + this.settings.postsPagingPath + "/" + pageNum;
+            util.createDir(fileDestination);
+            fileDestination = fileDestination + "/index.html";
         }
 
-        
+        console.log("dest: ");
+        console.log(fileDestination);
 
         fs.writeFile(fileDestination, html, (err) => {
             if (err) return console.error(err);

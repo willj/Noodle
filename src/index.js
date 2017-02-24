@@ -16,7 +16,7 @@ const defaultSettings = {
     removeFileExtFromUrls: true,
     useDateInPostUrls: true,
     postsPerPage: 10,
-    postsPermalink: "blog/index.html",
+    postsPermalink: "index.html",
     postsPagingPath: "page"
 };
 
