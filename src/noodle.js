@@ -151,15 +151,114 @@ module.exports = {
         });
     },
 
+    getPostPagePaths: function(){
+        /*
+            TODO: work out blog paths
+            if pp has dir or name and no extension, create dir, set pagingPath to dir/pagingPath
+            if pp has no extension and no dir - then create dir from name, set pagingPath to dir/pagingPath
+            if pp has extension and no dir do nothing, set pagingPath to pagingPath
+            if pp has extension and dir, then create dir, set pagingPath to dir/pagingPath
+
+            each page needs to create a /2/index.html
+        */
+
+        let pp = path.parse(this.settings.postsPermalink);
+
+        if (pp.ext){
+
+        }
+
+        console.log(pp);
+    },
+
     generatePostPages: function(){
+
+        let postPaths = this.getPostPagePaths();
+
+        let pageOfPosts = [];
+        let pageNum = 1;
+
         Object.keys(this.posts).sort((a,b) => {
             // sort numerically after discarding prefix "p-" and postfix "-postCount"
             a = a.split("-");
             b = b.split("-");
             return a[1] - b[1];
         }).forEach((post) => {
-            console.log(post);
+            pageOfPosts.push(this.posts[post]);
+
+            if (pageOfPosts.length >= this.settings.postsPerPage){
+                this.generatePostPage(pageOfPosts, pageNum);
+                pageOfPosts = [];
+                pageNum += 1;
+            }
         });
+
+        // generate the last page of posts
+        if (pageOfPosts.length > 0){
+            this.generatePostPage(pageOfPosts, pageNum);
+        }
+    },
+
+    generatePostPage: function(posts, pageNum){
+        // console.log(pageNum);
+        // console.log(posts);
+
+        let model = this.settings;
+        model.pageNum = pageNum;
+        model.posts = posts;
+
+        //console.log(posts);
+
+        let templateName = util.getTemplateName(this.settings.postsPermalink, {type: "posts"}, this.templates);  
+
+        if (templateName == undefined) return;
+
+        let html = this.renderPage(this.templates[templateName], "", model);
+
+        //console.log(html);
+
+        let fileDestination = this.settings.outputDir + this.settings.postsPermalink;
+
+        if (pageNum > 1){
+            let fileDestination = this.settings.outputDir + pageNum + "/" + this.settings.postsPermalink;
+        }
+
+        
+
+        fs.writeFile(fileDestination, html, (err) => {
+            if (err) return console.error(err);
+        });
+
+        // let docSourcePath = this.settings.sourceDir + filePath + fileName;
+        // let doc = fm(fs.readFileSync(docSourcePath, "utf8"));
+
+        // if (this.isInPostsDirectory(filePath)){
+        //     doc.attributes.type = "post";
+        // }
+
+        // let model = this.settings;
+        // model.doc = doc.attributes;
+        // model.fileSource = docSourcePath;
+        // model.fileDestination = this.getFileDestination(filePath, fileName, doc.attributes);
+
+        // let templateName = util.getTemplateName(filePath + fileName, doc.attributes, this.templates);  
+
+        // if (templateName == undefined) return;
+
+        // if ("type" in model.doc && model.doc.type == "post"){
+        //     this.indexPost(model);
+        // }
+
+        // let html = this.renderPage(this.templates[templateName], md.render(doc.body), model);
+
+        // if (model.fileDestination.path){
+        //     util.createDir(this.settings.outputDir + model.fileDestination.path);
+        // }
+
+        // fs.writeFile(this.settings.outputDir + model.fileDestination.path + model.fileDestination.fileName, html, (err) => {
+        //     if (err) return console.error(err);
+        // });
+
     },
 
     renderPage: function (template, body, model) {

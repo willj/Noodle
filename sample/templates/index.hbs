@@ -2,4 +2,12 @@
 
 {{> body-content }}
 
+<h2>Posts listing</h2>
+
+  {{#each posts}}
+    <article>
+        <h3>{{ attributes.title }}</h3>
+    </article>
+  {{/each}}
+
 {{> footer }}

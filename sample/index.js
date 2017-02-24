@@ -6,7 +6,8 @@ const settings = {
     siteTitle: "Sample noodle site",
     somethingElse: "123",
     removeFileExtFromUrls: true,
-    useDateInPostUrls: true
+    useDateInPostUrls: true,
+    postsPerPage: 10
 };
 
 noodle(settings);
