@@ -14,6 +14,7 @@ module.exports = {
     settings: null, 
     templates: null,
     posts: {},
+    postCount: 0,
     
     init: function (settings){
         this.settings = settings;
@@ -69,26 +70,15 @@ module.exports = {
     indexPost: function(post){
         let d = util.getPostDate(post.doc.date);
 
-        if (!this.posts[d.getFullYear()]){
-            this.posts[d.getFullYear()] = {};
-        }
-
-        if (!this.posts[d.getFullYear()][d.getMonth()]){
-            this.posts[d.getFullYear()][d.getMonth()] = {}
-        }
-
-        if (!this.posts[d.getFullYear()][d.getMonth()][d.getDate()]){
-            this.posts[d.getFullYear()][d.getMonth()][d.getDate()] = [];
-        }
-
-        let p = {
+        // postCount ensures all posts have a unique key when getTime() is the same
+        this.posts["p-" + d.getTime() + "-" + this.postCount] = {
             fileSource: post.fileSource,
             fileDestination: post.fileDestination,
             attributes: post.doc,
             postDate: d
         };
-
-        this.posts[d.getFullYear()][d.getMonth()][d.getDate()].push(p);
+        
+        this.postCount += 1;
     },
 
     getFileDestination: function (filePath, fileName, pageAttributes){
@@ -162,8 +152,14 @@ module.exports = {
     },
 
     generatePostPages: function(){
-        // console.log(this.posts);
-        // console.log(this.posts[2017][1]);
+        Object.keys(this.posts).sort((a,b) => {
+            // sort numerically after discarding prefix "p-" and postfix "-postCount"
+            a = a.split("-");
+            b = b.split("-");
+            return a[1] - b[1];
+        }).forEach((post) => {
+            console.log(post);
+        });
     },
 
     renderPage: function (template, body, model) {
