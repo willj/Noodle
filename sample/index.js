@@ -7,8 +7,8 @@ const settings = {
     somethingElse: "123",
     removeFileExtFromUrls: true,
     useDateInPostUrls: true,
-    postsPerPage: 2,
-    postsPermalink: "jog.html"
+    postsPerPage: 1,
+    postsPermalink: "index.html"
 };
 
 noodle(settings);

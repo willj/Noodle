@@ -10,4 +10,12 @@
     </article>
   {{/each}}
 
+  {{#if paging.previous}}
+    <a href="{{paging.previous}}">Previous</a>
+  {{/if}}
+  
+  {{#if paging.next}}
+    <a href="{{paging.next}}">Next</a>
+  {{/if}}
+
 {{> footer }}

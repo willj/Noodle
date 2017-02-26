@@ -15,6 +15,7 @@ module.exports = {
     templates: null,
     posts: {},
     postCount: 0,
+    totalPostPages: 0,
     
     init: function (settings){
         this.settings = settings;
@@ -155,7 +156,6 @@ module.exports = {
         let pp = path.parse(this.settings.postsPermalink);
 
         if (pp.ext && pp.dir){
-            console.log("1");
             return {
                 path: pp.dir + "/",
                 fileName: pp.name + pp.ext
@@ -163,7 +163,6 @@ module.exports = {
         }
 
         if (pp.ext && !pp.dir){
-            console.log("2");
             return {
                 path: "",
                 fileName: pp.name + pp.ext
@@ -171,7 +170,6 @@ module.exports = {
         }
 
         if (!pp.ext){
-            console.log("3");
             return {
                 path: pp.dir + "/" + pp.name + "/",
                 fileName: "index.html"
@@ -184,6 +182,7 @@ module.exports = {
 
         let pageOfPosts = [];
         let pageNum = 1;
+        this.totalPostPages = Math.ceil(this.postCount / this.settings.postsPerPage);
 
         Object.keys(this.posts).sort((a,b) => {
             // sort numerically after discarding prefix "p-" and postfix "-postCount"
@@ -210,10 +209,9 @@ module.exports = {
         let model = this.settings;
         model.pageNum = pageNum;
         model.posts = posts;
+        model.paging = this.generatePagingLinks(pageNum, this.totalPostPages, postPath);
 
         let templateName = util.getTemplateName(this.settings.postsPermalink, {type: "posts"}, this.templates);  
-
-        console.log("template: " + templateName);
 
         if (templateName == undefined) return;
 
@@ -231,43 +229,32 @@ module.exports = {
             fileDestination = fileDestination + "/index.html";
         }
 
-        console.log("dest: ");
-        console.log(fileDestination);
-
         fs.writeFile(fileDestination, html, (err) => {
             if (err) return console.error(err);
         });
+    },
 
-        // let docSourcePath = this.settings.sourceDir + filePath + fileName;
-        // let doc = fm(fs.readFileSync(docSourcePath, "utf8"));
+    generatePagingLinks: function(pageNum, totalPages, postPath){
+        let paging = {
+            currentPageNum: pageNum,
+            totalPages: totalPages
+        };
 
-        // if (this.isInPostsDirectory(filePath)){
-        //     doc.attributes.type = "post";
-        // }
+        if (pageNum == 1){
+            paging.previous = null;
+        } else if (pageNum == 2) {
+            paging.previous = "/" + postPath.path + postPath.fileName;
+        } else {
+            paging.previous = "/" + postPath.path + this.settings.postsPagingPath + "/" + (pageNum - 1);
+        }
 
-        // let model = this.settings;
-        // model.doc = doc.attributes;
-        // model.fileSource = docSourcePath;
-        // model.fileDestination = this.getFileDestination(filePath, fileName, doc.attributes);
+        if (pageNum == totalPages){
+            paging.next = null;
+        } else {
+            paging.next = "/" + postPath.path + this.settings.postsPagingPath + "/" + (pageNum + 1);
+        }
 
-        // let templateName = util.getTemplateName(filePath + fileName, doc.attributes, this.templates);  
-
-        // if (templateName == undefined) return;
-
-        // if ("type" in model.doc && model.doc.type == "post"){
-        //     this.indexPost(model);
-        // }
-
-        // let html = this.renderPage(this.templates[templateName], md.render(doc.body), model);
-
-        // if (model.fileDestination.path){
-        //     util.createDir(this.settings.outputDir + model.fileDestination.path);
-        // }
-
-        // fs.writeFile(this.settings.outputDir + model.fileDestination.path + model.fileDestination.fileName, html, (err) => {
-        //     if (err) return console.error(err);
-        // });
-
+        return paging;
     },
 
     renderPage: function (template, body, model) {
