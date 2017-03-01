@@ -54,6 +54,15 @@ module.exports = {
         if (templateName == undefined) return;
 
         if ("type" in model.doc && model.doc.type == "post"){
+            if (!doc.attributes.excerpt && !doc.attributes.excerptHtml){
+                
+                let firstParagraph = doc.body.split("\r\n").find((line) => {
+                    return /^[a-zA-Z0-9]+/.test(line);
+                });
+
+                doc.attributes.excerpt = firstParagraph;
+            }
+
             this.indexPost(model);
         }
 

@@ -7,6 +7,12 @@
   {{#each posts}}
     <article>
         <h3>{{ attributes.title }}</h3>
+        {{#if attributes.excerptHtml }}
+          {{{ attributes.excerptHtml }}}
+        {{/if}}
+        {{#if attributes.excerpt }}
+          <p>{{ attributes.excerpt }}</p>
+        {{/if}}
     </article>
   {{/each}}
 
