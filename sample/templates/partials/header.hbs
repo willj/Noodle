@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ siteTitle }} - {{ doc.title }}</title>
+    <title>
+        {{ siteTitle }}
+        {{#if doc.title }}
+         - {{ doc.title }}
+         {{/if }}
+    </title>
 </head>
 <body>
     <header>

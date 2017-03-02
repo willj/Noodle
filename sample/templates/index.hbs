@@ -6,7 +6,7 @@
 
   {{#each posts}}
     <article>
-        <h3>{{ attributes.title }}</h3>
+        <h3><a href="{{ fileDestination.permalink }}">{{ attributes.title }}</a></h3>
         {{#if attributes.excerptHtml }}
           {{{ attributes.excerptHtml }}}
         {{/if}}

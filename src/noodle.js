@@ -100,12 +100,14 @@ module.exports = {
             if (plink.ext){
                 return {
                     path: plink.dir + "/",
-                    fileName: plink.name + plink.ext
+                    fileName: plink.name + plink.ext,
+                    permalink: "/" + plink.dir + "/" + plink.name + plink.ext
                 }
             } else {
                 return {
                     path: plink.dir + "/" + plink.name + "/",
-                    fileName: "index.html"
+                    fileName: "index.html",
+                    permalink: "/" + plink.dir + "/" + plink.name + "/"
                 }
             }
         }
@@ -119,12 +121,14 @@ module.exports = {
             if (this.settings.removeFileExtFromUrls){
                 return {
                     path: postPathDate + util.getSlug(pageAttributes.title) + "/",
-                    fileName: "index.html"
+                    fileName: "index.html",
+                    permalink: "/" + postPathDate + util.getSlug(pageAttributes.title) + "/"
                 }
             } else {
                 return {
                     path: postPathDate,
-                    fileName: util.getSlug(pageAttributes.title) + ".html"
+                    fileName: util.getSlug(pageAttributes.title) + ".html",
+                    permalink: "/" + postPathDate + util.getSlug(pageAttributes.title) + ".html"
                 }
             }
         }
@@ -133,12 +137,14 @@ module.exports = {
         if (this.settings.removeFileExtFromUrls){
             return {
                 path: filePath + "/" + path.parse(fileName).name + "/",
-                fileName: "index.html"
+                fileName: "index.html",
+                permalink: "/" + filePath + "/" + path.parse(fileName).name + "/"
             }
         } else {
             return {
                 path: filePath,
-                fileName: path.parse(fileName).name + ".html"
+                fileName: path.parse(fileName).name + ".html",
+                permalink: "/" + filePath + "/" + path.parse(fileName).name + ".html"
             }
         }
 
@@ -216,6 +222,7 @@ module.exports = {
 
     generatePostPage: function(posts, pageNum, postPath){
         let model = this.settings;
+        model.doc = null;   // something seems to be holding on to the last processed page model
         model.pageNum = pageNum;
         model.posts = posts;
         model.paging = this.generatePagingLinks(pageNum, this.totalPostPages, postPath);
