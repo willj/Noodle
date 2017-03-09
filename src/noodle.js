@@ -203,7 +203,7 @@ module.exports = {
             // sort numerically after discarding prefix "p-" and postfix "-postCount"
             a = a.split("-");
             b = b.split("-");
-            return a[1] - b[1];
+            return b[1] - a[1];
         }).forEach((post) => {
             pageOfPosts.push(this.posts[post]);
 
